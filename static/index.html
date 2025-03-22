@@ -2,42 +2,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Games</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <style>
-    .section-container {
-      max-width: 800px;
-      margin-right: auto;
-      margin-left: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17-beta.0/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .section-container {
+            max-width: 800px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+    </style>
 </head>
 <body>
-  <div id="app" class="container">
+<div id="app" class="container">
+    <section class="section section-container" style="padding-bottom: 10px;">
+        <div class="box">
+            <search-games title="Search Games" @search-games-db="searchGames" :search="search"/>
+        </div>
+    </section>
+    <section class="section section-container" style="padding-top: 24px; padding-bottom: 5px;">
+        <populate-button @database-populated="refreshGames"/>
+    </section>
     <section class="section section-container" style="padding-top: 24px; padding-bottom: 5px;">
         <h2 class="title">Games</h2>
         <game v-for="(game, index) in games"
-            :key="`game.name-${index}`"
-            :game="game"
-            @save-game="onAddOrUpdateGame"
-            @delete-game="deleteGame" />
+              :key="`game.name-${index}`"
+              :game="game"
+              @save-game="onAddOrUpdateGame"
+              @delete-game="deleteGame"/>
     </section>
     <section class="section section-container" style="padding-bottom: 10px;">
-      <div class="box">
-        <add-update-game title="Add Game" @save-game="onAddOrUpdateGame" />
-      </div>
+        <div class="box">
+            <add-update-game title="Add Game" @save-game="onAddOrUpdateGame"/>
+        </div>
     </section>
-  </div>
-  <script>
+</div>
+<script>
   const AddUpdateGame = {
     props: ['game', 'title'],
-    data () {
+    data() {
       return {
         id: this.game ? this.game.id : null,
         publisherId: this.game ? this.game.publisherId : '',
@@ -51,7 +59,16 @@
     },
     methods: {
       save() {
-        this.$emit('save-game', { id: this.id, publisherId: this.publisherId, name: this.name, platform: this.platform, storeId: this.storeId, bundleId: this.bundleId, appVersion: this.appVersion, isPublished: this.isPublished })
+        this.$emit('save-game', {
+          id: this.id,
+          publisherId: this.publisherId,
+          name: this.name,
+          platform: this.platform,
+          storeId: this.storeId,
+          bundleId: this.bundleId,
+          appVersion: this.appVersion,
+          isPublished: this.isPublished
+        })
         if (!this.id) {
           this.publisherId = ''
           this.name = ''
@@ -67,61 +84,61 @@
       <form class="form" @submit.prevent="save">
         <h3 class='subtitle'>{{ title }}</h3>
         <div class="field">
-            <label>Publisher Id</label>
-            <div class="control">
-              <input class="input" type="text" v-model="publisherId">
-            </div>
+          <label>Publisher Id</label>
+          <div class="control">
+            <input class="input" type="text" v-model="publisherId">
+          </div>
         </div>
         <div class="field">
-            <label>Name</label>
-            <div class="control">
-              <input class="input" type="text" v-model="name">
-            </div>
+          <label>Name</label>
+          <div class="control">
+            <input class="input" type="text" v-model="name">
+          </div>
         </div>
         <div class="field">
-            <label>Platform</label>
+          <label>Platform</label>
+          <div class="control">
             <div class="control">
-              <div class="control">
               <input type="radio" id="ios" v-model="platform" value="ios">
               <label for="ios">iOS</label>
               <br>
               <input type="radio" id="android" v-model="platform" value="android">
               <label for="android">Android</label>
             </div>
-            </div>
+          </div>
         </div>
         <div class="field">
-            <label>Store Id</label>
-            <div class="control">
-              <input class="input" type="text" v-model="storeId">
-            </div>
+          <label>Store Id</label>
+          <div class="control">
+            <input class="input" type="text" v-model="storeId">
+          </div>
         </div>
         <div class="field">
-            <label>Bundle Id</label>
-            <div class="control">
-              <input class="input" type="text" v-model="bundleId">
-            </div>
+          <label>Bundle Id</label>
+          <div class="control">
+            <input class="input" type="text" v-model="bundleId">
+          </div>
         </div>
         <div class="field">
-            <label>App Version</label>
-            <div class="control">
-              <input class="input" type="text" v-model="appVersion">
-            </div>
+          <label>App Version</label>
+          <div class="control">
+            <input class="input" type="text" v-model="appVersion">
+          </div>
         </div>
         <div class="field">
-            <label>Is Published</label>
-            <div class="control">
-              <input type="radio" id="one" v-model="isPublished" v-bind:value="true">
-              <label for="one">Yes</label>
-              <br>
-              <input type="radio" id="two" v-model="isPublished" v-bind:value="false">
-              <label for="two">No</label>
-            </div>
+          <label>Is Published</label>
+          <div class="control">
+            <input type="radio" id="one" v-model="isPublished" v-bind:value="true">
+            <label for="one">Yes</label>
+            <br>
+            <input type="radio" id="two" v-model="isPublished" v-bind:value="false">
+            <label for="two">No</label>
+          </div>
         </div>
         <div class="field">
-            <div class="control">
-              <button class="button is-success">Save</button>
-            </div>
+          <div class="control">
+            <button class="button is-success">Save</button>
+          </div>
         </div>
       </form>
     `
@@ -129,8 +146,8 @@
 
   const Game = {
     props: ['game'],
-    components: { 'add-update-game': AddUpdateGame },
-    data () {
+    components: {'add-update-game': AddUpdateGame},
+    data() {
       return {
         showDetail: false
       }
@@ -139,7 +156,7 @@
       onAddOrUpdateGame(game) {
         this.$emit('save-game', game)
       },
-      deleteGame (game) {
+      deleteGame(game) {
         this.$emit('delete-game', game)
       }
     },
@@ -156,28 +173,117 @@
           </a>
         </header>
         <div v-show="showDetail" class="card-content">
-            <add-update-game title="Details" :game="game" @save-game="onAddOrUpdateGame" />
+          <add-update-game title="Details" :game="game" @save-game="onAddOrUpdateGame"/>
         </div>
       </div>
     `
   }
 
+  const Search = {
+    data() {
+      return {
+        name: '', platform: ''
+      }
+    }, methods: {
+      searchGames() {
+        this.$emit('search-games-db', {name: this.name, platform: this.platform})
+      }
+    },
+    template: `
+      <form class="form" @submit.prevent="searchGames">
+        <h2 class="title">Search Games</h2>
+        <div class="field">
+          <label>Name</label>
+          <div class="control">
+            <input class="input" type="text" v-model="name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Platform</label>
+          <div class="control">
+            <div class="control">
+              <select v-model="platform" class="input">
+                <option value="">All</option>
+                <option>ios</option>
+                <option>android</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-success">Search</button>
+          </div>
+        </div>
+      </form>
+    `
+  }
+
+  const PopulateButton = {
+    data() {
+      return {
+        isLoading: false,
+        message: ''
+      }
+    },
+    methods: {
+      populateDatabase() {
+        this.isLoading = true;
+        this.message = 'Populating database...';
+
+        axios.post('/api/games/populate')
+                .then(response => {
+                  this.message = 'Database populated successfully!';
+                  this.$emit('database-populated');
+                })
+                .catch(error => {
+                  this.message = `Error: ${error.response?.data?.error?.message || 'Something went wrong'}`;
+                  console.error('Population error:', error);
+                })
+                .finally(() => {
+                  this.isLoading = false;
+                  // Clear success message after 3 seconds
+                  if (this.message.includes('successfully')) {
+                    setTimeout(() => {
+                      this.message = '';
+                    }, 3000);
+                  }
+                });
+      }
+    },
+    template: `
+    <div class="box">
+      <h3 class="subtitle">Database Management</h3>
+      <button
+        class="button is-primary"
+        @click="populateDatabase"
+        :class="{'is-loading': isLoading}"
+        :disabled="isLoading">
+        Populate with Top 100 Games
+      </button>
+      <p class="mt-2" :class="{'has-text-success': message.includes('success'), 'has-text-danger': message.includes('Error')}">
+        {{ message }}
+      </p>
+    </div>
+  `
+  }
   new Vue({
     el: '#app',
-    components: { game: Game, 'add-update-game': AddUpdateGame },
+    components: {game: Game, 'add-update-game': AddUpdateGame, 'search-games': Search, 'populate-button': PopulateButton},
     data: {
       games: [],
+      search: [],
       apiURL: 'http://localhost:3000/api/games'
     },
     methods: {
-      onAddOrUpdateGame (game) {
+      onAddOrUpdateGame(game) {
         if (game.id) {
           this.updateGame(game)
         } else {
           this.addGame(game)
         }
       },
-      addGame (game) {
+      addGame(game) {
         return axios.post(this.apiURL, game)
           .then((response) => {
             const copy = this.games.slice()
@@ -185,7 +291,7 @@
             this.games = copy
           })
       },
-      updateGame (game) {
+      updateGame(game) {
         return axios.put(`${this.apiURL}/${game.id}`, game)
           .then((response) => {
             const copy = this.games.slice()
@@ -194,7 +300,7 @@
             this.games = copy
           })
       },
-      deleteGame (game) {
+      deleteGame(game) {
         console.log('deleting', game)
         return axios.delete(`${this.apiURL}/${game.id}`)
           .then((response) => {
@@ -203,9 +309,15 @@
             copy.splice(idx, 1)
             this.games = copy
           })
+      },
+      searchGames(search) {
+        return axios.post(`${this.apiURL}/search`, search)
+          .then((response) => {
+            this.games = response.data
+          })
       }
     },
-    beforeMount () {
+    beforeMount() {
       axios.get(this.apiURL)
         .then((response) => {
           this.games = response.data
@@ -213,6 +325,6 @@
     }
   })
 
-  </script>
+</script>
 </body>
 </html>
