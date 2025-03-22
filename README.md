@@ -63,8 +63,33 @@ Many other applications at Voodoo will use consume this API.
 We are planning to put this project in production. According to you, what are the missing pieces to make this project production ready? 
 Please elaborate an action plan.
 
+For the project to go to production we need to do the following, some points can be discussed orally during the interview:
+- Create a DNS entry (discuss here about the use of Route53) + SSL certificate if needed
+- Create a stack for the application on AWS for example using Cloudformation or Terraform
+- Containerize the application with Docker OR Localstack for local development (discuss here how I'm used to work with cloudformation and sam using Makefiles)
+- Create complete unit tests for the API
+- Create complete integration tests for the UI (may be done by the QA team)
+- Replace the SQLite with a real database (discuss here about a relational database vs NoSQL like dynamoDB) 
+- Implement authentication, create a service that will authenticate the user and return a token (discuss here about Cognito, Auth0, etc)
+- Secure all the API route with the service that manage authentication (discuss here about the use of middleware or the authorisation can be done directly in another service like Cognito)
+- Implement an Error handling & logging service (discuss here about the library I developed and used previously, LoggerService)
+- Move the config in a service like ssm or secrets manager with separate config for dev, staging and production
+- Implement a CI/CD pipeline with a build step that will run the unit tests and deploy the code to the different environment
+- Use a monitoring service like Cloudwatch to monitor the application (ex. log insight, alarm, etc)
+
 #### Question 2:
 Let's pretend our data team is now delivering new files every day into the S3 bucket, and our service needs to ingest those files
 every day through the populate API. Could you describe a suitable solution to automate this? Feel free to propose architectural changes.
+
+The solution proposed is adapted for a AWS env or any cloud provider that has a similar service (normally I would create a diagram to explain the architecture):
+- Create a lambda that will be triggered by a Cloudwatch event every day when there's no traffic on the database (or every time the file is uploaded discuss this with the data team)
+- The lambda will validate the data contained in the file and then create batches, depending on the number of lines (if we really want to respect the separation of concern we can create a step function one for the validation, one for the split and one for the insertion but it will be overkill for this use case)
+- If the number of lines contained in the file is too big we can use a queuing system to "chunk" the data and process it in parallel, using SQS for example we can define in the configuration how many lambda can run in parallel 
+    an example of configuration could be:
+        - 5 lambda can run in parallel
+        - 100 lines per lambda
+- If the number of lines contained in the file is small like in the test we can process the data directly in the lambda
+- For the SQS implementation we can even use the DLQ (dead letter queue) to store the data that can't be processed and send an email to the data team to inform them that the data is corrupted or notify them any other way
+
 
 
